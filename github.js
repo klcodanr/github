@@ -27,6 +27,8 @@
   var API_URL = 'https://api.github.com';
 
   var Github = function(options) {
+  
+    var ghOptions = options;
 
     // HTTP Request Abstraction
     // =======
@@ -54,7 +56,7 @@
           }
         }
       };
-      xhr.setRequestHeader('Accept','application/vnd.github.v3.raw+json');
+      xhr.setRequestHeader('Accept','application/vnd.github.raw+json');
       xhr.setRequestHeader('Content-Type','application/json;charset=UTF-8');
       if ((options.token) || (options.username && options.password)) {
            xhr.setRequestHeader('Authorization', options.token
@@ -358,8 +360,13 @@
             "encoding": "utf-8"
           };
         } else {
+        	var str = '';
+        	var bin = new Uint8Array(content);
+        	for (var i = 0; i < bin.length; i++ ) {
+        		str += String.fromCharCode(bin[i]);
+        	}
           	content = {
-              "content": btoa(String.fromCharCode.apply(null, new Uint8Array(content))),
+              "content": btoa(str),
               "encoding": "base64"
             };
           }
@@ -410,7 +417,8 @@
         var data = {
           "message": message,
           "author": {
-            "name": options.username
+            "name": ghOptions.username,
+            "email": ghOptions.email
           },
           "parents": [
             parent
